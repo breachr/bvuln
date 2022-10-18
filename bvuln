@@ -1,0 +1,70 @@
+#!/bin/python3
+# -*- coding: utf-8 -*-
+# ##################################################
+import pyperclip, webbrowser, sys, argparse
+from subprocess import check_output
+print('''
+                 .:odxxddl:,.              
+               'lxOkol::;;,,,'.            
+            ,xXWKOkOKXXXX0xl;.             
+          .dNMMMMMWXOdooooddxdc;.          
+         ,OWMMWXkl;.           ..          
+        cXMWKd:.                           
+      .oNMWk'                         ..   
+     .dNMWx.                          'd:  
+    .xWMWx.                           .xK; 
+   .dWMWk.                             dW0,
+   :XMMK;   .                     .    dWMO
+   :XMM0'  .oo'....';:;,'.......'c;   .xMWk
+   .oNMX;  .dNNK0KXNWMk:'...'',,...   ,KMO'
+    .oNWd.  'OWMMMMMMMx,.            .dWO' 
+      cKK;   ,0MMMMMMMx,.            cKk'  
+       ,Ox'   ;0MMMMMMx,.          .:Od.   
+        .okd,  ;KMMMMMx'.        .oOkc     
+          :O0:  ,xKWMWd..       .xKx'      
+           .ckl.  .,:c'        ,xx,        bvuln
+             .::.            .;c,          by breachr
+
+'''
+)
+
+parser = argparse.ArgumentParser(description="Find vulnerabilities")
+parser.add_argument('searchterm', action='store', nargs='*', help='Search Terms')
+parser.add_argument('-v', '--reverse', default=False, action='store', nargs='*', help='Excluded Terms')
+parser.add_argument('-e', '--extended', default=False, action='store_true')
+a = parser.parse_args()
+search = " ".join(a.searchterm)
+
+if len(sys.argv) < 2:
+  print("Usage: bvuln <SEARCH_TERM> <SEARCH_TERM> -v <EXCLUDED> <EXCLUDED>")
+  exit()
+
+open = webbrowser.open_new_tab
+open(F"https://www.exploit-db.com/")
+open(F"https://exploits.shodan.io/?q={search}")
+open(F"https://sploitus.com/?query={search}#exploits")
+open(F"https://packetstormsecurity.com/search/?q={search}")
+open(F"https://www.google.com/search?q={search}+exploit")
+open(F"https://www.google.com/search?q={search}+exploit+github")
+open(F"https://www.google.com/search?q={search}+default+password")
+
+# TODO: extended
+# https://www.cvedetails.com/google-search-results.php?q={search}
+# https://book.hacktricks.xyz/welcome/readme?q={search}
+# https://ippsec.rocks/?#
+
+if a.reverse:
+  excluded = "|".join(a.reverse)
+  print(check_output(F"searchsploit {search} --exclude='{excluded}'", shell="/bin/bash").decode("UTF-8"))
+  print("Searching for Metasploit Modules...")
+  print(check_output(F"msfconsole -qx 'grep -v {excluded} search {search};exit'", shell="/bin/bash").decode("UTF-8"))
+else:
+  print(check_output(F"searchsploit {search}", shell="/bin/bash").decode("UTF-8"))
+  print("Searching for Metasploit Modules...")
+  print(check_output(F"msfconsole -qx 'search {search};exit'", shell="/bin/bash").decode("UTF-8"))
+
+pyperclip.copy(search)
+print("Appname copied to Clipboard")
+print(F"Remember to update searchsploit regulary!")
+print("Run: \033[91msudo searchsploit -u\033[0m")
+print(F"Look for default credentials / locations etc. now!")
